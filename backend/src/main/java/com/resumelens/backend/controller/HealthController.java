@@ -1,19 +1,21 @@
 package com.resumelens.backend.controller;
 
+import com.resumelens.backend.dto.ApiResponse;
+import com.resumelens.backend.service.ResumeService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 public class HealthController {
 
-    @GetMapping("/api/health")
-    public Map<String, String> health() {
-        return Map.of(
-                "status", "UP",
-                "application", "ResumeLens AI",
-                "version", "1.0.0"
-        );
+    private final ResumeService resumeService;
+
+    public HealthController(ResumeService resumeService) {
+        this.resumeService = resumeService;
+    }
+
+    @GetMapping("/api/resume/info")
+    public ApiResponse applicationInfo() {
+        return resumeService.getApplicationInfo();
     }
 }
