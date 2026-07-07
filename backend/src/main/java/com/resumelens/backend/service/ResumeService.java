@@ -4,26 +4,37 @@ import com.resumelens.backend.dto.ApiResponse;
 import com.resumelens.backend.dto.ParsedResumeResponse;
 import com.resumelens.backend.dto.ResumeTextResponse;
 import com.resumelens.backend.dto.ResumeUploadResponse;
+import com.resumelens.backend.parser.EducationExtractor;
+import com.resumelens.backend.parser.ExperienceExtractor;
 import com.resumelens.backend.parser.PdfParser;
 import com.resumelens.backend.parser.ResumeParser;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Collections;
 
 @Service
 public class ResumeService {
 
     private final PdfParser pdfParser;
     private final ResumeParser resumeParser;
+    private final EducationExtractor educationExtractor;
+    private final ExperienceExtractor experienceExtractor;
 
-    public ResumeService(PdfParser pdfParser, ResumeParser resumeParser) {
+    public ResumeService(
+            PdfParser pdfParser,
+            ResumeParser resumeParser,
+            EducationExtractor educationExtractor,
+            ExperienceExtractor experienceExtractor) {
+
         this.pdfParser = pdfParser;
         this.resumeParser = resumeParser;
+        this.educationExtractor = educationExtractor;
+        this.experienceExtractor = experienceExtractor;
     }
 
     public ApiResponse getApplicationInfo() {
+
         return new ApiResponse(
                 "SUCCESS",
                 "Welcome to ResumeLens AI Backend"
@@ -56,8 +67,8 @@ public class ResumeService {
                 resumeParser.extractEmail(text),
                 resumeParser.extractPhone(text),
                 resumeParser.extractSkills(text),
-                Collections.emptyList(),
-                Collections.emptyList()
+                educationExtractor.extract(text),
+                experienceExtractor.extract(text)
         );
     }
 }
