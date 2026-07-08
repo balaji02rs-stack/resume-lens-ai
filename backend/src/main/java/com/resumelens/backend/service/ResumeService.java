@@ -1,6 +1,7 @@
 package com.resumelens.backend.service;
 
 import com.resumelens.backend.dto.ApiResponse;
+import com.resumelens.backend.dto.AtsScoreResponse;
 import com.resumelens.backend.dto.ParsedResumeResponse;
 import com.resumelens.backend.dto.ResumeTextResponse;
 import com.resumelens.backend.dto.ResumeUploadResponse;
@@ -20,17 +21,20 @@ public class ResumeService {
     private final ResumeParser resumeParser;
     private final EducationExtractor educationExtractor;
     private final ExperienceExtractor experienceExtractor;
+    private final AtsScoreService atsScoreService;
 
     public ResumeService(
             PdfParser pdfParser,
             ResumeParser resumeParser,
             EducationExtractor educationExtractor,
-            ExperienceExtractor experienceExtractor) {
+            ExperienceExtractor experienceExtractor,
+            AtsScoreService atsScoreService) {
 
         this.pdfParser = pdfParser;
         this.resumeParser = resumeParser;
         this.educationExtractor = educationExtractor;
         this.experienceExtractor = experienceExtractor;
+        this.atsScoreService = atsScoreService;
     }
 
     public ApiResponse getApplicationInfo() {
@@ -70,5 +74,12 @@ public class ResumeService {
                 educationExtractor.extract(text),
                 experienceExtractor.extract(text)
         );
+    }
+
+    public AtsScoreResponse calculateAtsScore(MultipartFile file) throws IOException {
+
+        String text = pdfParser.extractText(file);
+
+        return atsScoreService.calculateScore(text);
     }
 }
