@@ -2,37 +2,27 @@ package com.resumelens.backend.parser;
 
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ExperienceExtractor {
 
+    private final SectionParser sectionParser;
+
+    public ExperienceExtractor(SectionParser sectionParser) {
+        this.sectionParser = sectionParser;
+    }
+
     public List<String> extract(String text) {
 
-        List<String> experience = new ArrayList<>();
+        List<String> experience = sectionParser.extractSection(text, "EXPERIENCE");
 
-        String[] lines = text.split("\\R");
+        if (experience.isEmpty()) {
+            experience = sectionParser.extractSection(text, "WORK EXPERIENCE");
+        }
 
-        boolean capture = false;
-
-        for (String line : lines) {
-
-            String current = line.trim();
-
-            if (current.equalsIgnoreCase("Experience")) {
-                capture = true;
-                continue;
-            }
-
-            if (capture) {
-
-                if (current.isBlank()) {
-                    break;
-                }
-
-                experience.add(current);
-            }
+        if (experience.isEmpty()) {
+            experience = sectionParser.extractSection(text, "PROFESSIONAL EXPERIENCE");
         }
 
         return experience;
