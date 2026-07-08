@@ -1,10 +1,6 @@
 package com.resumelens.backend.service;
 
-import com.resumelens.backend.dto.ApiResponse;
-import com.resumelens.backend.dto.AtsScoreResponse;
-import com.resumelens.backend.dto.ParsedResumeResponse;
-import com.resumelens.backend.dto.ResumeTextResponse;
-import com.resumelens.backend.dto.ResumeUploadResponse;
+import com.resumelens.backend.dto.*;
 import com.resumelens.backend.parser.EducationExtractor;
 import com.resumelens.backend.parser.ExperienceExtractor;
 import com.resumelens.backend.parser.PdfParser;
@@ -22,23 +18,25 @@ public class ResumeService {
     private final EducationExtractor educationExtractor;
     private final ExperienceExtractor experienceExtractor;
     private final AtsScoreService atsScoreService;
+    private final JobMatchService jobMatchService;
 
     public ResumeService(
             PdfParser pdfParser,
             ResumeParser resumeParser,
             EducationExtractor educationExtractor,
             ExperienceExtractor experienceExtractor,
-            AtsScoreService atsScoreService) {
+            AtsScoreService atsScoreService,
+            JobMatchService jobMatchService) {
 
         this.pdfParser = pdfParser;
         this.resumeParser = resumeParser;
         this.educationExtractor = educationExtractor;
         this.experienceExtractor = experienceExtractor;
         this.atsScoreService = atsScoreService;
+        this.jobMatchService = jobMatchService;
     }
 
     public ApiResponse getApplicationInfo() {
-
         return new ApiResponse(
                 "SUCCESS",
                 "Welcome to ResumeLens AI Backend"
@@ -81,5 +79,13 @@ public class ResumeService {
         String text = pdfParser.extractText(file);
 
         return atsScoreService.calculateScore(text);
+    }
+
+    public JobMatchResponse matchResume(MultipartFile file, String jobDescription)
+            throws IOException {
+
+        String resumeText = pdfParser.extractText(file);
+
+        return jobMatchService.matchResume(resumeText, jobDescription);
     }
 }

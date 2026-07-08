@@ -1,9 +1,6 @@
 package com.resumelens.backend.controller;
 
-import com.resumelens.backend.dto.AtsScoreResponse;
-import com.resumelens.backend.dto.ParsedResumeResponse;
-import com.resumelens.backend.dto.ResumeTextResponse;
-import com.resumelens.backend.dto.ResumeUploadResponse;
+import com.resumelens.backend.dto.*;
 import com.resumelens.backend.service.ResumeService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -47,5 +44,14 @@ public class ResumeController {
             @RequestParam("file") MultipartFile file) throws IOException {
 
         return resumeService.calculateAtsScore(file);
+    }
+
+    @PostMapping(value = "/job-match", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public JobMatchResponse jobMatch(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("jobDescription") String jobDescription)
+            throws IOException {
+
+        return resumeService.matchResume(file, jobDescription);
     }
 }
