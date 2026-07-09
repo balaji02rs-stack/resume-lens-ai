@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -12,8 +13,6 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    // 32-byte Base64 encoded secret (example only).
-    // We'll move this to application.properties later.
     private static final String SECRET_KEY =
             "UmVzdW1lTGVuc0FJU3VwZXJTZWNyZXRLZXlGb3JKV1QxMjM0NTY3ODkw";
 
@@ -32,19 +31,22 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractEmail(String token) {
-
+    public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
 
-        try {
-            extractAllClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        String username = extractUsername(token);
+
+        return username.equals(userDetails.getUsername())
+                && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractAllClaims(token)
+                .getExpiration()
+                .before(new Date());
     }
 
     private Claims extractAllClaims(String token) {
