@@ -5,15 +5,43 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import UploadResume from "./pages/UploadResume";
 import ResumeHistory from "./pages/ResumeHistory";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Routes>
+
       <Route path="/" element={<Login />} />
+
       <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/upload" element={<UploadResume />} />
-      <Route path="/history" element={<ResumeHistory />} />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/upload"
+        element={
+          <ProtectedRoute>
+            <UploadResume />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute>
+            <ResumeHistory />
+          </ProtectedRoute>
+        }
+      />
+
     </Routes>
   );
 }
