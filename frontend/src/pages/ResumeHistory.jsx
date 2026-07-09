@@ -14,7 +14,7 @@ function ResumeHistory() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:8080/api/resume/history",
+        "https://resume-lens-backend-bxb8.onrender.com/api/resume/history",
         {
           headers: {
             Authorization: `Bearer ${token}`,

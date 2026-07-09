@@ -36,7 +36,7 @@ function UploadResume() {
 
       const response = await axios.post(
 
-        "http://localhost:8080/api/resume/analyze",
+        "https://resume-lens-backend-bxb8.onrender.com/api/resume/analyze",
 
         formData,
 
