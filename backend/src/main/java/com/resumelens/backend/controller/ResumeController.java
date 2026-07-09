@@ -1,8 +1,11 @@
 package com.resumelens.backend.controller;
 
 import com.resumelens.backend.dto.*;
+import com.resumelens.backend.security.UserDetailsImpl;
+import com.resumelens.backend.service.ResumeAnalysisService;
 import com.resumelens.backend.service.ResumeService;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,9 +16,14 @@ import java.io.IOException;
 public class ResumeController {
 
     private final ResumeService resumeService;
+    private final ResumeAnalysisService resumeAnalysisService;
 
-    public ResumeController(ResumeService resumeService) {
+    public ResumeController(
+            ResumeService resumeService,
+            ResumeAnalysisService resumeAnalysisService) {
+
         this.resumeService = resumeService;
+        this.resumeAnalysisService = resumeAnalysisService;
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -53,5 +61,21 @@ public class ResumeController {
             throws IOException {
 
         return resumeService.matchResume(file, jobDescription);
+    }
+
+    @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResumeAnalysisResponse analyzeResume(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("jobDescription") String jobDescription,
+            Authentication authentication)
+            throws IOException {
+
+        UserDetailsImpl user =
+                (UserDetailsImpl) authentication.getPrincipal();
+
+        return resumeAnalysisService.analyzeResume(
+                file,
+                jobDescription,
+                user.getUsername());
     }
 }
