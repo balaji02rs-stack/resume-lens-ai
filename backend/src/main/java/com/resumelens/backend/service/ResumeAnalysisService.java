@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ResumeAnalysisService {
@@ -77,12 +79,8 @@ public class ResumeAnalysisService {
         resume.setFileName(file.getOriginalFilename());
         resume.setAtsScore(atsScore.getAtsScore());
         resume.setJobMatchScore(jobMatch.getMatchScore());
-
-        resume.setExtractedSkills(
-                String.join(", ", parsedResume.getSkills()));
-
+        resume.setExtractedSkills(String.join(", ", parsedResume.getSkills()));
         resume.setUploadedAt(LocalDateTime.now());
-
         resume.setUser(user);
 
         resumeRepository.save(resume);
@@ -97,5 +95,22 @@ public class ResumeAnalysisService {
                 resume.getUploadedAt(),
                 true
         );
+    }
+
+    public List<ResumeHistoryResponse> getResumeHistory(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return resumeRepository.findByUserOrderByUploadedAtDesc(user)
+                .stream()
+                .map(resume -> new ResumeHistoryResponse(
+                        resume.getId(),
+                        resume.getFileName(),
+                        resume.getAtsScore(),
+                        resume.getJobMatchScore(),
+                        resume.getUploadedAt()
+                ))
+                .collect(Collectors.toList());
     }
 }
